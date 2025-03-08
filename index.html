@@ -25,8 +25,8 @@
 
         // Variables para escalar el juego
         let scale = 1; // Factor de escala para ajustar el juego al tamaño de la pantalla
-        let baseWidth = 1920; // Ancho base del juego
-        let baseHeight = 1080; // Alto base del juego
+        const baseWidth = 1920; // Ancho base del juego
+        const baseHeight = 1080; // Alto base del juego
 
         // Función para ajustar el tamaño del canvas y escalar el juego
         function resizeCanvas() {
@@ -56,6 +56,7 @@
 
         // Ajustar el canvas al cargar la página y al cambiar el tamaño de la ventana
         window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
 
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
