@@ -49,9 +49,9 @@
 
             // Ajustar la posición de las nubes y el cartel
             decorativeImages.forEach(deco => {
-                deco.y = deco.y * scale;
+                deco.y = 400 * scale; // Ajustar la posición vertical de las nubes
             });
-            signY = 930 * scale;
+            signY = 930 * scale; // Ajustar la posición vertical del cartel
         }
 
         // Ajustar el canvas al cargar la página y al cambiar el tamaño de la ventana
