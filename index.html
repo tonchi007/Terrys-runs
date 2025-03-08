@@ -44,7 +44,7 @@
 
         // Variables para controlar el cartel
         let signX = canvas.width; // Comienza fuera del canvas
-        let signY = 930; // Posición vertical del cartel
+        let signY = 0; // Se actualizará en resizeCanvas
 
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
@@ -136,11 +136,15 @@
             player.x = 100 * scale;
             player.jumpPower = -15 * scale;
 
-            // Ajustar la posición de las nubes y el cartel
+            // Ajustar la posición de las nubes
             decorativeImages.forEach(deco => {
-                deco.y = 400 * scale; // Ajustar la posición vertical de las nubes
+                deco.y = (400 + Math.random() * 100) * scale; // Ajustar la posición vertical de las nubes
+                deco.speed = (Math.random() * 2 + 1) * scale; // Ajustar la velocidad de las nubes
             });
-            signY = 930 * scale; // Ajustar la posición vertical del cartel
+
+            // Ajustar la posición y tamaño del cartel
+            signX = canvas.width; // El cartel comienza fuera del canvas
+            signY = canvas.height - 150 * scale; // Ajustar la posición vertical del cartel
         }
 
         // Ajustar el canvas al cargar la página y al cambiar el tamaño de la ventana
@@ -159,7 +163,7 @@
 
         // Función para verificar colisiones
         function checkCollision(rect1, rect2) {
-            const buffer = 20; // Reduce el área efectiva de colisión
+            const buffer = 20 * scale; // Buffer de colisión escalado
             return (
                 rect1.x + buffer < rect2.x + rect2.width - buffer &&
                 rect1.x + rect1.width - buffer > rect2.x + buffer &&
@@ -171,24 +175,29 @@
         // Función para dibujar las nubes decorativas
         function drawDecorative() {
             decorativeImages.forEach(deco => {
-                ctx.drawImage(deco.img, deco.x * scale, deco.y * scale, 100 * scale, 50 * scale); // Ajusta el tamaño según la escala
-                deco.x -= deco.speed; // Mueve la imagen hacia la izquierda
+                const cloudWidth = 100 * scale; // Ancho de la nube escalado
+                const cloudHeight = 50 * scale; // Alto de la nube escalado
+                ctx.drawImage(deco.img, deco.x, deco.y, cloudWidth, cloudHeight); // Dibujar la nube
+                deco.x -= deco.speed; // Mover la nube hacia la izquierda
 
-                // Reiniciar la posición cuando la imagen salga del canvas
-                if (deco.x + 100 * scale < 0) {
+                // Reiniciar la posición cuando la nube salga del canvas
+                if (deco.x + cloudWidth < 0) {
                     deco.x = canvas.width;
-                    deco.y = Math.random() * (canvas.height / 2); // Cambia la posición vertical aleatoriamente
+                    deco.y = (400 + Math.random() * 100) * scale; // Nueva posición vertical
+                    deco.speed = (Math.random() * 2 + 1) * scale; // Nueva velocidad
                 }
             });
         }
 
         // Función para dibujar el cartel decorativo
         function drawSign() {
-            ctx.drawImage(signImage, signX * scale, signY * scale, 150 * scale, 120 * scale); // Ajusta el tamaño según la escala
-            signX -= gameSpeed; // Mueve el cartel hacia la izquierda a la velocidad del juego
+            const signWidth = 150 * scale; // Ancho del cartel escalado
+            const signHeight = 120 * scale; // Alto del cartel escalado
+            ctx.drawImage(signImage, signX, signY, signWidth, signHeight); // Dibujar el cartel
+            signX -= gameSpeed; // Mover el cartel hacia la izquierda
 
             // Reiniciar la posición cuando el cartel salga del canvas
-            if (signX + 150 * scale < 0) {
+            if (signX + signWidth < 0) {
                 signX = canvas.width;
             }
         }
@@ -211,9 +220,15 @@
             }
 
             if (Math.random() < 0.008) { // Obstáculos aparecen más espaciados
-                let size = Math.random() * 100 + 50;
+                let size = (Math.random() * 100 + 50) * scale; // Tamaño del obstáculo escalado
                 let img = obstacleImages[Math.floor(Math.random() * obstacleImages.length)];
-                obstacles.push({ x: canvas.width, y: canvas.height - size - 50, width: size, height: size, img: img });
+                obstacles.push({
+                    x: canvas.width, // Comienza fuera del canvas
+                    y: canvas.height - size - 50 * scale, // Posición vertical escalada
+                    width: size,
+                    height: size,
+                    img: img
+                });
             }
             
             obstacles.forEach(obstacle => obstacle.x -= gameSpeed);
@@ -246,14 +261,16 @@
 
             // Dibujar la línea de suelo
             ctx.fillStyle = "white";
-            ctx.fillRect(0, canvas.height - 60 * scale, canvas.width, 10 * scale);
+            const groundY = canvas.height - 60 * scale; // Posición vertical de la línea de suelo
+            const groundHeight = 10 * scale; // Altura de la línea de suelo
+            ctx.fillRect(0, groundY, canvas.width, groundHeight);
 
             // Dibujar al jugador
-            ctx.drawImage(playerImages[currentFrame], player.x * scale, player.y * scale, player.width * scale, player.height * scale);
+            ctx.drawImage(playerImages[currentFrame], player.x, player.y, player.width, player.height);
             
             // Dibujar obstáculos
             obstacles.forEach(obstacle => {
-                ctx.drawImage(obstacle.img, obstacle.x * scale, obstacle.y * scale, obstacle.width * scale, obstacle.height * scale);
+                ctx.drawImage(obstacle.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
             });
             
             // Dibujar la puntuación
@@ -315,6 +332,20 @@
             }
             if (isGameOver) {
                 document.location.reload();
+            }
+        });
+
+        // Evento de teclado para la barra espaciadora
+        document.addEventListener("keydown", (event) => {
+            if (event.code === "Space") {
+                if (!gameStarted) {
+                    gameStarted = true;
+                } else if (player.jumps < player.maxJumps) {
+                    player.dy = player.jumpPower;
+                    player.grounded = false;
+                    player.jumps++;
+                    jumpSound.play();
+                }
             }
         });
 
