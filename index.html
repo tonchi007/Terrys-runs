@@ -62,6 +62,13 @@
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
             const img = new Image();
             img.src = src;
+            img.onload = () => {
+                console.log(`Imagen cargada: ${src}`); // Depuración
+                onImageLoad();
+            };
+            img.onerror = () => {
+                console.error(`Error al cargar la imagen: ${src}`); // Depuración
+            };
             return img;
         });
         let currentFrame = 0;
@@ -71,6 +78,13 @@
         const obstacleImages = ["obstacle1.png", "obstacle2.png", "obstacle3.png"].map(src => {
             const img = new Image();
             img.src = src;
+            img.onload = () => {
+                console.log(`Imagen cargada: ${src}`); // Depuración
+                onImageLoad();
+            };
+            img.onerror = () => {
+                console.error(`Error al cargar la imagen: ${src}`); // Depuración
+            };
             return img;
         });
 
@@ -82,11 +96,25 @@
         ];
         decorativeImages.forEach((deco, index) => {
             deco.img.src = `./cloud${index + 1}.png`; // Asegúrate de tener imágenes como "cloud1.png", "cloud2.png", etc.
+            deco.img.onload = () => {
+                console.log(`Imagen cargada: cloud${index + 1}.png`); // Depuración
+                onImageLoad();
+            };
+            deco.img.onerror = () => {
+                console.error(`Error al cargar la imagen: cloud${index + 1}.png`); // Depuración
+            };
         });
 
         // Cargar imagen del cartel decorativo
         const signImage = new Image();
         signImage.src = "./sign.png"; // Asegúrate de tener una imagen llamada "sign.png"
+        signImage.onload = () => {
+            console.log("Imagen cargada: sign.png"); // Depuración
+            onImageLoad();
+        };
+        signImage.onerror = () => {
+            console.error("Error al cargar la imagen: sign.png"); // Depuración
+        };
 
         // Variables para controlar el cartel
         let signX = canvas.width; // Comienza fuera del canvas
@@ -98,15 +126,12 @@
 
         function onImageLoad() {
             imagesLoaded++;
+            console.log(`Imágenes cargadas: ${imagesLoaded}/${totalImages}`); // Depuración
             if (imagesLoaded === totalImages) {
+                console.log("Todas las imágenes cargadas. Iniciando juego..."); // Depuración
                 gameLoop();
             }
         }
-
-        playerImages.forEach(img => img.onload = onImageLoad);
-        obstacleImages.forEach(img => img.onload = onImageLoad);
-        decorativeImages.forEach(deco => deco.img.onload = onImageLoad);
-        signImage.onload = onImageLoad;
 
         // Variables del jugador
         let player = { 
