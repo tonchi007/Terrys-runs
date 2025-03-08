@@ -23,9 +23,40 @@
         const ctx = canvas.getContext("2d");
         document.body.appendChild(canvas);
 
-        // Ajustar el tamaño del canvas al tamaño de la pantalla
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // Variables para escalar el juego
+        let scale = 1; // Factor de escala para ajustar el juego al tamaño de la pantalla
+        let baseWidth = 1920; // Ancho base del juego
+        let baseHeight = 1080; // Alto base del juego
+
+        // Función para ajustar el tamaño del canvas y escalar el juego
+        function resizeCanvas() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // Calcular la escala en función del ancho o alto de la pantalla
+            scale = Math.min(windowWidth / baseWidth, windowHeight / baseHeight);
+
+            // Ajustar el tamaño del canvas
+            canvas.width = baseWidth * scale;
+            canvas.height = baseHeight * scale;
+
+            // Ajustar la posición inicial del jugador y otros elementos
+            player.y = canvas.height - 200 * scale;
+            player.width = 150 * scale;
+            player.height = 150 * scale;
+            player.x = 100 * scale;
+            player.jumpPower = -15 * scale;
+
+            // Ajustar la posición de las nubes y el cartel
+            decorativeImages.forEach(deco => {
+                deco.y = deco.y * scale;
+            });
+            signY = 930 * scale;
+        }
+
+        // Ajustar el canvas al cargar la página y al cambiar el tamaño de la ventana
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
 
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
@@ -115,11 +146,11 @@
         // Función para dibujar las nubes decorativas
         function drawDecorative() {
             decorativeImages.forEach(deco => {
-                ctx.drawImage(deco.img, deco.x, deco.y, 100, 50); // Ajusta el tamaño según tu imagen
+                ctx.drawImage(deco.img, deco.x * scale, deco.y * scale, 100 * scale, 50 * scale); // Ajusta el tamaño según la escala
                 deco.x -= deco.speed; // Mueve la imagen hacia la izquierda
 
                 // Reiniciar la posición cuando la imagen salga del canvas
-                if (deco.x + 100 < 0) {
+                if (deco.x + 100 * scale < 0) {
                     deco.x = canvas.width;
                     deco.y = Math.random() * (canvas.height / 2); // Cambia la posición vertical aleatoriamente
                 }
@@ -128,11 +159,11 @@
 
         // Función para dibujar el cartel decorativo
         function drawSign() {
-            ctx.drawImage(signImage, signX, signY, 150, 120); // Ajusta el tamaño según tu imagen
+            ctx.drawImage(signImage, signX * scale, signY * scale, 150 * scale, 120 * scale); // Ajusta el tamaño según la escala
             signX -= gameSpeed; // Mueve el cartel hacia la izquierda a la velocidad del juego
 
             // Reiniciar la posición cuando el cartel salga del canvas
-            if (signX + 150 < 0) {
+            if (signX + 150 * scale < 0) {
                 signX = canvas.width;
             }
         }
@@ -147,8 +178,8 @@
             
             player.y += player.dy;
             player.dy += player.gravity;
-            if (player.y >= canvas.height - 200) {
-                player.y = canvas.height - 200;
+            if (player.y >= canvas.height - 200 * scale) {
+                player.y = canvas.height - 200 * scale;
                 player.dy = 0;
                 player.grounded = true;
                 player.jumps = 0;
@@ -190,20 +221,20 @@
 
             // Dibujar la línea de suelo
             ctx.fillStyle = "white";
-            ctx.fillRect(0, canvas.height - 60, canvas.width, 10);
+            ctx.fillRect(0, canvas.height - 60 * scale, canvas.width, 10 * scale);
 
             // Dibujar al jugador
-            ctx.drawImage(playerImages[currentFrame], player.x, player.y, player.width, player.height);
+            ctx.drawImage(playerImages[currentFrame], player.x * scale, player.y * scale, player.width * scale, player.height * scale);
             
             // Dibujar obstáculos
             obstacles.forEach(obstacle => {
-                ctx.drawImage(obstacle.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                ctx.drawImage(obstacle.img, obstacle.x * scale, obstacle.y * scale, obstacle.width * scale, obstacle.height * scale);
             });
             
             // Dibujar la puntuación
             ctx.fillStyle = "white";
-            ctx.font = "30px Arial";
-            ctx.fillText("Score: " + score, 100, 50);
+            ctx.font = `${30 * scale}px Arial`;
+            ctx.fillText("Score: " + score, 100 * scale, 50 * scale);
             
             // Dibujar pantalla de Game Over
             if (isGameOver) {
@@ -217,12 +248,12 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = "white";
-            ctx.font = "50px Arial";
+            ctx.font = `${50 * scale}px Arial`;
             ctx.textAlign = "center";
             ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
-            ctx.font = "30px Arial";
-            ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50);
-            ctx.fillText("Press R to Restart", canvas.width / 2, canvas.height / 2 + 100);
+            ctx.font = `${30 * scale}px Arial`;
+            ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50 * scale);
+            ctx.fillText("Toca para reiniciar", canvas.width / 2, canvas.height / 2 + 100 * scale);
         }
 
         // Dibujar menú de inicio
@@ -231,7 +262,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = "white";
-            ctx.font = "50px Arial";
+            ctx.font = `${50 * scale}px Arial`;
             ctx.textAlign = "center";
             ctx.fillText("Toca para comenzar", canvas.width / 2, canvas.height / 2);
         }
@@ -257,20 +288,13 @@
                 player.jumps++;
                 jumpSound.play();
             }
-        });
-
-        // Evento de teclado para reiniciar (opcional)
-        document.addEventListener("keydown", (event) => {
-            if (event.code === "KeyR" && isGameOver) {
+            if (isGameOver) {
                 document.location.reload();
             }
         });
 
         // Ajustar el tamaño del canvas al cambiar el tamaño de la ventana
-        window.addEventListener("resize", () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+        window.addEventListener("resize", resizeCanvas);
     </script>
 </body>
 </html>
