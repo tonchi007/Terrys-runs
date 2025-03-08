@@ -128,10 +128,22 @@
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
 
-            // Calcular la escala en función del ancho o alto de la pantalla
-            scale = Math.min(windowWidth / baseWidth, windowHeight / baseHeight);
+            // Relación de aspecto del juego (baseWidth / baseHeight = 16:9)
+            const gameAspectRatio = baseWidth / baseHeight;
 
-            // Ajustar el tamaño del canvas
+            // Relación de aspecto de la pantalla
+            const screenAspectRatio = windowWidth / windowHeight;
+
+            // Calcular la escala en función de la relación de aspecto
+            if (screenAspectRatio > gameAspectRatio) {
+                // Pantalla más ancha que el juego (16:10 o similar)
+                scale = windowHeight / baseHeight;
+            } else {
+                // Pantalla más estrecha que el juego (16:9 o similar)
+                scale = windowWidth / baseWidth;
+            }
+
+            // Ajustar el tamaño del canvas para mantener la relación de aspecto del juego
             canvas.width = baseWidth * scale;
             canvas.height = baseHeight * scale;
 
