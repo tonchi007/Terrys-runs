@@ -46,6 +46,12 @@
         let signX = canvas.width; // Comienza fuera del canvas
         let signY = 0; // Se actualizará en resizeCanvas
 
+        // Variables del juego
+        let gameSpeed = 5; // Velocidad del juego
+        let score = 0; // Puntuación
+        let isGameOver = false; // Estado del juego
+        let gameStarted = false; // Indica si el juego ha comenzado
+
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
             const img = new Image();
@@ -134,7 +140,11 @@
             player.width = 150 * scale;
             player.height = 150 * scale;
             player.x = 100 * scale;
-            player.jumpPower = -15 * scale;
+            player.jumpPower = -15 * scale; // Potencia del salto escalada
+            player.gravity = 0.5 * scale; // Gravedad escalada
+
+            // Ajustar la velocidad del juego
+            gameSpeed = 5 * scale; // Velocidad del juego escalada
 
             // Ajustar la posición de las nubes
             decorativeImages.forEach(deco => {
@@ -152,10 +162,6 @@
         resizeCanvas();
 
         let obstacles = [];
-        let gameSpeed = 5;
-        let score = 0;
-        let isGameOver = false;
-        let gameStarted = false;
 
         // Sonidos
         const jumpSound = new Audio('./jump.wav');
@@ -207,7 +213,7 @@
             if (isGameOver || !gameStarted) return;
             
             if (score % 500 === 0 && score !== 0) {
-                gameSpeed += 0.5;
+                gameSpeed += 0.5 * scale; // Aumentar la velocidad del juego escalada
             }
             
             player.y += player.dy;
