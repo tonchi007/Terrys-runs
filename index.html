@@ -28,6 +28,20 @@
         const baseWidth = 1920; // Ancho base del juego
         const baseHeight = 1080; // Alto base del juego
 
+        // Variables del jugador (declaradas antes de usarlas en resizeCanvas)
+        let player = { 
+            x: 100, 
+            y: 0, // Se actualizará en resizeCanvas
+            width: 150, 
+            height: 150, 
+            dy: 0, 
+            gravity: 0.5, 
+            jumpPower: -15, 
+            grounded: false, 
+            jumps: 0, 
+            maxJumps: 2
+        };
+
         // Función para ajustar el tamaño del canvas y escalar el juego
         function resizeCanvas() {
             const windowWidth = window.innerWidth;
@@ -132,20 +146,6 @@
                 gameLoop();
             }
         }
-
-        // Variables del jugador
-        let player = { 
-            x: 100, 
-            y: canvas.height - 200, 
-            width: 150, 
-            height: 150, 
-            dy: 0, 
-            gravity: 0.5, 
-            jumpPower: -15, 
-            grounded: false, 
-            jumps: 0, 
-            maxJumps: 2
-        };
 
         let obstacles = [];
         let gameSpeed = 5;
