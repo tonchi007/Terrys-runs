@@ -28,7 +28,7 @@
         const baseWidth = 1920; // Ancho base del juego
         const baseHeight = 1080; // Alto base del juego
 
-        // Variables del jugador (declaradas antes de usarlas en resizeCanvas)
+        // Variables del jugador
         let player = { 
             x: 100, 
             y: 0, // Se actualizará en resizeCanvas
@@ -42,35 +42,9 @@
             maxJumps: 2
         };
 
-        // Función para ajustar el tamaño del canvas y escalar el juego
-        function resizeCanvas() {
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-
-            // Calcular la escala en función del ancho o alto de la pantalla
-            scale = Math.min(windowWidth / baseWidth, windowHeight / baseHeight);
-
-            // Ajustar el tamaño del canvas
-            canvas.width = baseWidth * scale;
-            canvas.height = baseHeight * scale;
-
-            // Ajustar la posición inicial del jugador y otros elementos
-            player.y = canvas.height - 200 * scale;
-            player.width = 150 * scale;
-            player.height = 150 * scale;
-            player.x = 100 * scale;
-            player.jumpPower = -15 * scale;
-
-            // Ajustar la posición de las nubes y el cartel
-            decorativeImages.forEach(deco => {
-                deco.y = 400 * scale; // Ajustar la posición vertical de las nubes
-            });
-            signY = 930 * scale; // Ajustar la posición vertical del cartel
-        }
-
-        // Ajustar el canvas al cargar la página y al cambiar el tamaño de la ventana
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
+        // Variables para controlar el cartel
+        let signX = canvas.width; // Comienza fuera del canvas
+        let signY = 930; // Posición vertical del cartel
 
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
@@ -130,10 +104,6 @@
             console.error("Error al cargar la imagen: sign.png"); // Depuración
         };
 
-        // Variables para controlar el cartel
-        let signX = canvas.width; // Comienza fuera del canvas
-        let signY = 930; // Posición vertical del cartel
-
         // Contador de imágenes cargadas
         let imagesLoaded = 0;
         const totalImages = playerImages.length + obstacleImages.length + decorativeImages.length + 1; // +1 para el cartel
@@ -146,6 +116,36 @@
                 gameLoop();
             }
         }
+
+        // Función para ajustar el tamaño del canvas y escalar el juego
+        function resizeCanvas() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // Calcular la escala en función del ancho o alto de la pantalla
+            scale = Math.min(windowWidth / baseWidth, windowHeight / baseHeight);
+
+            // Ajustar el tamaño del canvas
+            canvas.width = baseWidth * scale;
+            canvas.height = baseHeight * scale;
+
+            // Ajustar la posición inicial del jugador y otros elementos
+            player.y = canvas.height - 200 * scale;
+            player.width = 150 * scale;
+            player.height = 150 * scale;
+            player.x = 100 * scale;
+            player.jumpPower = -15 * scale;
+
+            // Ajustar la posición de las nubes y el cartel
+            decorativeImages.forEach(deco => {
+                deco.y = 400 * scale; // Ajustar la posición vertical de las nubes
+            });
+            signY = 930 * scale; // Ajustar la posición vertical del cartel
+        }
+
+        // Ajustar el canvas al cargar la página y al cambiar el tamaño de la ventana
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
 
         let obstacles = [];
         let gameSpeed = 5;
