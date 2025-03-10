@@ -10,6 +10,7 @@
             padding: 0;
             overflow: hidden;
             height: 100%;
+            background-color: black;
         }
         canvas {
             display: block;
@@ -24,14 +25,14 @@
         document.body.appendChild(canvas);
 
         // Variables para escalar el juego
-        let scale = 1; // Factor de escala para ajustar el juego al tamaño de la pantalla
-        const baseWidth = 2556; // Ancho base del juego
-        const baseHeight = 1179; // Alto base del juego
+        let scale = 1;
+        const baseWidth = 2556;
+        const baseHeight = 1179;
 
         // Variables del jugador
         let player = { 
             x: 100, 
-            y: 0, // Se actualizará en resizeCanvas
+            y: 0, 
             width: 150, 
             height: 150, 
             dy: 0, 
@@ -43,26 +44,21 @@
         };
 
         // Variables para controlar el cartel
-        let signX = canvas.width; // Comienza fuera del canvas
-        let signY = 0; // Se actualizará en resizeCanvas
+        let signX = canvas.width;
+        let signY = 0;
 
         // Variables del juego
-        let gameSpeed = 5; // Velocidad del juego
-        let score = 0; // Puntuación
-        let isGameOver = false; // Estado del juego
-        let gameStarted = false; // Indica si el juego ha comenzado
+        let gameSpeed = 5;
+        let score = 0;
+        let isGameOver = false;
+        let gameStarted = false;
 
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
             const img = new Image();
             img.src = src;
-            img.onload = () => {
-                console.log(`Imagen cargada: ${src}`); // Depuración
-                onImageLoad();
-            };
-            img.onerror = () => {
-                console.error(`Error al cargar la imagen: ${src}`); // Depuración
-            };
+            img.onload = onImageLoad;
+            img.onerror = () => console.error(`Error al cargar la imagen: ${src}`);
             return img;
         });
         let currentFrame = 0;
@@ -72,13 +68,8 @@
         const obstacleImages = ["obstacle1.png", "obstacle2.png", "obstacle3.png"].map(src => {
             const img = new Image();
             img.src = src;
-            img.onload = () => {
-                console.log(`Imagen cargada: ${src}`); // Depuración
-                onImageLoad();
-            };
-            img.onerror = () => {
-                console.error(`Error al cargar la imagen: ${src}`); // Depuración
-            };
+            img.onload = onImageLoad;
+            img.onerror = () => console.error(`Error al cargar la imagen: ${src}`);
             return img;
         });
 
@@ -89,36 +80,24 @@
             { img: new Image(), x: canvas.width + 600, y: 750, speed: 1.5 },
         ];
         decorativeImages.forEach((deco, index) => {
-            deco.img.src = `./cloud${index + 1}.png`; // Asegúrate de tener imágenes como "cloud1.png", "cloud2.png", etc.
-            deco.img.onload = () => {
-                console.log(`Imagen cargada: cloud${index + 1}.png`); // Depuración
-                onImageLoad();
-            };
-            deco.img.onerror = () => {
-                console.error(`Error al cargar la imagen: cloud${index + 1}.png`); // Depuración
-            };
+            deco.img.src = `./cloud${index + 1}.png`;
+            deco.img.onload = onImageLoad;
+            deco.img.onerror = () => console.error(`Error al cargar la imagen: cloud${index + 1}.png`);
         });
 
         // Cargar imagen del cartel decorativo
         const signImage = new Image();
-        signImage.src = "./sign.png"; // Asegúrate de tener una imagen llamada "sign.png"
-        signImage.onload = () => {
-            console.log("Imagen cargada: sign.png"); // Depuración
-            onImageLoad();
-        };
-        signImage.onerror = () => {
-            console.error("Error al cargar la imagen: sign.png"); // Depuración
-        };
+        signImage.src = "./sign.png";
+        signImage.onload = onImageLoad;
+        signImage.onerror = () => console.error("Error al cargar la imagen: sign.png");
 
         // Contador de imágenes cargadas
         let imagesLoaded = 0;
-        const totalImages = playerImages.length + obstacleImages.length + decorativeImages.length + 1; // +1 para el cartel
+        const totalImages = playerImages.length + obstacleImages.length + decorativeImages.length + 1;
 
         function onImageLoad() {
             imagesLoaded++;
-            console.log(`Imágenes cargadas: ${imagesLoaded}/${totalImages}`); // Depuración
             if (imagesLoaded === totalImages) {
-                console.log("Todas las imágenes cargadas. Iniciando juego..."); // Depuración
                 gameLoop();
             }
         }
@@ -128,48 +107,36 @@
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
 
-            // Relación de aspecto del juego (baseWidth / baseHeight = 16:9)
             const gameAspectRatio = baseWidth / baseHeight;
-
-            // Relación de aspecto de la pantalla
             const screenAspectRatio = windowWidth / windowHeight;
 
-            // Calcular la escala en función de la relación de aspecto
             if (screenAspectRatio > gameAspectRatio) {
-                // Pantalla más ancha que el juego (16:10 o similar)
                 scale = windowHeight / baseHeight;
             } else {
-                // Pantalla más estrecha que el juego (16:9 o similar)
                 scale = windowWidth / baseWidth;
             }
 
-            // Ajustar el tamaño del canvas para mantener la relación de aspecto del juego
             canvas.width = baseWidth * scale;
             canvas.height = baseHeight * scale;
 
-            // Ajustar la posición inicial del jugador y otros elementos
             player.y = canvas.height - 200 * scale;
             player.width = 150 * scale;
             player.height = 150 * scale;
             player.x = 100 * scale;
-            player.jumpPower = -15 * scale; // Potencia del salto escalada
-            player.gravity = 0.5 * scale; // Gravedad escalada
+            player.jumpPower = -15 * scale;
+            player.gravity = 0.5 * scale;
 
-            // Ajustar la velocidad del juego
-            gameSpeed = 5 * scale; // Velocidad del juego escalada
+            gameSpeed = 5 * scale;
 
-            // Ajustar la posición de las nubes
             decorativeImages.forEach(deco => {
-                deco.y = (400 + Math.random() * 100) * scale; // Ajustar la posición vertical de las nubes
-                deco.speed = (Math.random() * 2 + 1) * scale; // Ajustar la velocidad de las nubes
+                deco.y = (400 + Math.random() * 100) * scale;
+                deco.speed = (Math.random() * 2 + 1) * scale;
             });
 
-            // Ajustar la posición y tamaño del cartel
-            signX = canvas.width; // El cartel comienza fuera del canvas
-            signY = canvas.height - 150 * scale; // Ajustar la posición vertical del cartel
+            signX = canvas.width;
+            signY = canvas.height - 150 * scale;
         }
 
-        // Ajustar el canvas al cargar la página y al cambiar el tamaño de la ventana
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
 
@@ -181,7 +148,7 @@
 
         // Función para verificar colisiones
         function checkCollision(rect1, rect2) {
-            const buffer = 20 * scale; // Buffer de colisión escalado
+            const buffer = 20 * scale;
             return (
                 rect1.x + buffer < rect2.x + rect2.width - buffer &&
                 rect1.x + rect1.width - buffer > rect2.x + buffer &&
@@ -193,28 +160,26 @@
         // Función para dibujar las nubes decorativas
         function drawDecorative() {
             decorativeImages.forEach(deco => {
-                const cloudWidth = 100 * scale; // Ancho de la nube escalado
-                const cloudHeight = 50 * scale; // Alto de la nube escalado
-                ctx.drawImage(deco.img, deco.x, deco.y, cloudWidth, cloudHeight); // Dibujar la nube
-                deco.x -= deco.speed; // Mover la nube hacia la izquierda
+                const cloudWidth = 100 * scale;
+                const cloudHeight = 50 * scale;
+                ctx.drawImage(deco.img, deco.x, deco.y, cloudWidth, cloudHeight);
+                deco.x -= deco.speed;
 
-                // Reiniciar la posición cuando la nube salga del canvas
                 if (deco.x + cloudWidth < 0) {
                     deco.x = canvas.width;
-                    deco.y = (400 + Math.random() * 100) * scale; // Nueva posición vertical
-                    deco.speed = (Math.random() * 2 + 1) * scale; // Nueva velocidad
+                    deco.y = (400 + Math.random() * 100) * scale;
+                    deco.speed = (Math.random() * 2 + 1) * scale;
                 }
             });
         }
 
         // Función para dibujar el cartel decorativo
         function drawSign() {
-            const signWidth = 150 * scale; // Ancho del cartel escalado
-            const signHeight = 120 * scale; // Alto del cartel escalado
-            ctx.drawImage(signImage, signX, signY, signWidth, signHeight); // Dibujar el cartel
-            signX -= gameSpeed; // Mover el cartel hacia la izquierda
+            const signWidth = 150 * scale;
+            const signHeight = 120 * scale;
+            ctx.drawImage(signImage, signX, signY, signWidth, signHeight);
+            signX -= gameSpeed;
 
-            // Reiniciar la posición cuando el cartel salga del canvas
             if (signX + signWidth < 0) {
                 signX = canvas.width;
             }
@@ -225,7 +190,7 @@
             if (isGameOver || !gameStarted) return;
             
             if (score % 500 === 0 && score !== 0) {
-                gameSpeed += 0.5 * scale; // Aumentar la velocidad del juego escalada
+                gameSpeed += 0.5 * scale;
             }
             
             player.y += player.dy;
@@ -237,12 +202,12 @@
                 player.jumps = 0;
             }
 
-            if (Math.random() < 0.008) { // Obstáculos aparecen más espaciados
-                let size = (Math.random() * 100 + 50) * scale; // Tamaño del obstáculo escalado
+            if (Math.random() < 0.008) {
+                let size = (Math.random() * 100 + 50) * scale;
                 let img = obstacleImages[Math.floor(Math.random() * obstacleImages.length)];
                 obstacles.push({
-                    x: canvas.width, // Comienza fuera del canvas
-                    y: canvas.height - size - 50 * scale, // Posición vertical escalada
+                    x: canvas.width,
+                    y: canvas.height - size - 50 * scale,
                     width: size,
                     height: size,
                     img: img
@@ -271,32 +236,24 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Dibujar las nubes decorativas
             drawDecorative();
-
-            // Dibujar el cartel decorativo
             drawSign();
 
-            // Dibujar la línea de suelo
             ctx.fillStyle = "white";
-            const groundY = canvas.height - 60 * scale; // Posición vertical de la línea de suelo
-            const groundHeight = 10 * scale; // Altura de la línea de suelo
+            const groundY = canvas.height - 60 * scale;
+            const groundHeight = 10 * scale;
             ctx.fillRect(0, groundY, canvas.width, groundHeight);
 
-            // Dibujar al jugador
             ctx.drawImage(playerImages[currentFrame], player.x, player.y, player.width, player.height);
             
-            // Dibujar obstáculos
             obstacles.forEach(obstacle => {
                 ctx.drawImage(obstacle.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
             });
             
-            // Dibujar la puntuación
             ctx.fillStyle = "white";
             ctx.font = `${30 * scale}px Arial`;
             ctx.fillText("Score: " + score, 100 * scale, 50 * scale);
             
-            // Dibujar pantalla de Game Over
             if (isGameOver) {
                 drawGameOver();
             }
