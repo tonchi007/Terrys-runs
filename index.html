@@ -344,7 +344,7 @@
             ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
             ctx.font = `${40 * scale}px Arial`;
             ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50 * scale);
-            ctx.fillText("Toca para reiniciar", canvas.width / 2, canvas.height / 2 + 100 * scale);
+            ctx.fillText("Toca o presiona Space para reiniciar", canvas.width / 2, canvas.height / 2 + 100 * scale);
         }
 
         // Dibujar menú de inicio
@@ -356,6 +356,31 @@
             ctx.font = `${60 * scale}px Arial`;
             ctx.textAlign = "center";
             ctx.fillText("Toca para comenzar", canvas.width / 2, canvas.height / 2);
+        }
+
+        // Función para reiniciar el juego
+        function resetGame() {
+            player = { 
+                x: 100, 
+                y: 0, 
+                width: 150, 
+                height: 150, 
+                dy: 0, 
+                gravity: 0.5, 
+                jumpPower: -15, 
+                grounded: false, 
+                jumps: 0, 
+                maxJumps: 2
+            };
+            gameSpeed = 5;
+            score = 0;
+            isGameOver = false;
+            gameStarted = false;
+            isPaused = false;
+            obstacles = [];
+            signX = canvas.width;
+            signY = canvas.height - 150 * scale;
+            resizeCanvas();
         }
 
         // Bucle principal del juego
@@ -382,9 +407,7 @@
                 jumpSound.play();
             }
             if (isGameOver) {
-                isGameOver = false;
-                isPaused = false; // Reanudar el juego al reiniciar
-                document.location.reload();
+                resetGame();
             }
         });
 
@@ -398,6 +421,9 @@
                     player.grounded = false;
                     player.jumps++;
                     jumpSound.play();
+                }
+                if (isGameOver) {
+                    resetGame();
                 }
             }
         });
