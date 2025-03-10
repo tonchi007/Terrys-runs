@@ -11,18 +11,41 @@
             overflow: hidden;
             height: 100%;
             background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
         }
         canvas {
             display: block;
             background-color: black;
         }
+        #orientation-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 24px;
+            z-index: 1000;
+        }
+        #orientation-message p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
+    <div id="orientation-message">
+        <p>Por favor, gira tu dispositivo a modo horizontal para jugar.</p>
+    </div>
+    <canvas id="game-canvas"></canvas>
     <script>
-        const canvas = document.createElement("canvas");
+        const canvas = document.getElementById("game-canvas");
         const ctx = canvas.getContext("2d");
-        document.body.appendChild(canvas);
+        const orientationMessage = document.getElementById("orientation-message");
 
         // Variables para escalar el juego
         let scale = 1;
@@ -153,8 +176,36 @@
             signY = canvas.height - 150 * scale;
         }
 
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
+        // Función para verificar la orientación de la pantalla
+        function checkOrientation() {
+            if (window.innerHeight > window.innerWidth) {
+                // Modo vertical
+                orientationMessage.style.display = "flex";
+                canvas.style.display = "none";
+            } else {
+                // Modo horizontal
+                orientationMessage.style.display = "none";
+                canvas.style.display = "block";
+                resizeCanvas();
+            }
+        }
+
+        // Bloquear la orientación en horizontal
+        function lockOrientation() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock("landscape").catch(() => {
+                    console.log("La API de orientación no es compatible o no se pudo bloquear.");
+                });
+            }
+        }
+
+        // Verificar la orientación al cargar y al cambiar el tamaño de la ventana
+        window.addEventListener("load", () => {
+            checkOrientation();
+            lockOrientation();
+        });
+        window.addEventListener("resize", checkOrientation);
+        window.addEventListener("orientationchange", checkOrientation);
 
         let obstacles = [];
 
