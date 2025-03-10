@@ -107,18 +107,31 @@
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
 
+            // Relación de aspecto del juego (baseWidth / baseHeight = 16:9)
             const gameAspectRatio = baseWidth / baseHeight;
+
+            // Relación de aspecto de la pantalla
             const screenAspectRatio = windowWidth / windowHeight;
 
+            // Calcular la escala en función de la relación de aspecto
             if (screenAspectRatio > gameAspectRatio) {
+                // Pantalla más ancha que el juego (16:10 o similar)
                 scale = windowHeight / baseHeight;
             } else {
+                // Pantalla más estrecha que el juego (16:9 o similar)
                 scale = windowWidth / baseWidth;
             }
 
+            // Aumentar el factor de escala en pantallas pequeñas
+            if (windowWidth < 768) {
+                scale *= 1.5; // Aumentar el tamaño de los objetos en un 50% en pantallas pequeñas
+            }
+
+            // Ajustar el tamaño del canvas para mantener la relación de aspecto del juego
             canvas.width = baseWidth * scale;
             canvas.height = baseHeight * scale;
 
+            // Ajustar la posición inicial del jugador y otros elementos
             player.y = canvas.height - 200 * scale;
             player.width = 150 * scale;
             player.height = 150 * scale;
@@ -126,13 +139,16 @@
             player.jumpPower = -15 * scale;
             player.gravity = 0.5 * scale;
 
+            // Ajustar la velocidad del juego
             gameSpeed = 5 * scale;
 
+            // Ajustar la posición de las nubes
             decorativeImages.forEach(deco => {
                 deco.y = (400 + Math.random() * 100) * scale;
                 deco.speed = (Math.random() * 2 + 1) * scale;
             });
 
+            // Ajustar la posición y tamaño del cartel
             signX = canvas.width;
             signY = canvas.height - 150 * scale;
         }
