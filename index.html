@@ -259,7 +259,7 @@
 
             // Ajustar la posición y tamaño del cartel
             signX = canvas.width;
-            signY = canvas.height - 150 * scale;
+            signY = canvas.height - 220 * scale;
         }
 
         // Función para verificar la orientación de la pantalla
@@ -315,7 +315,7 @@
         function drawDecorative() {
             decorativeImages.forEach(deco => {
                 const cloudWidth = 100 * scale;
-                const cloudHeight = 50 * scale;
+                const cloudHeight = 70 * scale;
                 ctx.drawImage(deco.img, deco.x, deco.y, cloudWidth, cloudHeight);
                 deco.x -= deco.speed;
 
@@ -329,8 +329,8 @@
 
         // Función para dibujar el cartel decorativo
         function drawSign() {
-            const signWidth = 150 * scale;
-            const signHeight = 120 * scale;
+            const signWidth = 250 * scale;
+            const signHeight = 220 * scale;
             ctx.drawImage(signImage, signX, signY, signWidth, signHeight);
             signX -= gameSpeed;
 
@@ -358,11 +358,11 @@
             }
 
             if (Math.random() < 0.008) {
-                let size = (Math.random() * 100 + 50) * scale;
+                let size = (Math.random() * 100 + 80) * scale;
                 let img = obstacleImages[Math.floor(Math.random() * obstacleImages.length)];
                 obstacles.push({
                     x: canvas.width,
-                    y: canvas.height - size - 50 * scale,
+                    y: canvas.height - size - 55 * scale,
                     width: size,
                     height: size,
                     img: img
