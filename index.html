@@ -75,6 +75,7 @@
         let score = 0;
         let isGameOver = false;
         let gameStarted = false;
+        let isPaused = false; // Nueva variable para controlar la pausa
 
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
@@ -257,7 +258,7 @@
 
         // Actualizar el estado del juego
         function update() {
-            if (isGameOver || !gameStarted) return;
+            if (isGameOver || !gameStarted || isPaused) return; // No actualizar si el juego está pausado
             console.log("Actualizando el juego...");
             
             if (score % 500 === 0 && score !== 0) {
@@ -291,6 +292,7 @@
             obstacles.forEach(obstacle => {
                 if (checkCollision(player, obstacle)) {
                     isGameOver = true;
+                    isPaused = true; // Pausar el juego cuando hay Game Over
                     gameOverSound.play();
                 }
             });
@@ -361,8 +363,10 @@
             if (!gameStarted) {
                 drawStartMenu();
             } else {
-                update();
-                draw();
+                if (!isPaused) { // Solo actualizar y dibujar si el juego no está pausado
+                    update();
+                    draw();
+                }
             }
             requestAnimationFrame(gameLoop);
         }
@@ -378,6 +382,8 @@
                 jumpSound.play();
             }
             if (isGameOver) {
+                isGameOver = false;
+                isPaused = false; // Reanudar el juego al reiniciar
                 document.location.reload();
             }
         });
