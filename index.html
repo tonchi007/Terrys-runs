@@ -317,8 +317,9 @@
                 ctx.drawImage(obstacle.img, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
             });
             
+            // Aumentar el tamaño del texto del score
             ctx.fillStyle = "white";
-            ctx.font = `${30 * scale}px Arial`;
+            ctx.font = `${40 * scale}px Arial`; // Aumentado de 30 a 40
             ctx.fillText("Score: " + score, 100 * scale, 50 * scale);
             
             if (isGameOver) {
@@ -332,10 +333,10 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = "white";
-            ctx.font = `${50 * scale}px Arial`;
+            ctx.font = `${60 * scale}px Arial`; // Aumentado de 50 a 60
             ctx.textAlign = "center";
             ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
-            ctx.font = `${30 * scale}px Arial`;
+            ctx.font = `${40 * scale}px Arial`; // Aumentado de 30 a 40
             ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50 * scale);
             ctx.fillText("Toca para reiniciar", canvas.width / 2, canvas.height / 2 + 100 * scale);
         }
@@ -346,7 +347,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = "white";
-            ctx.font = `${50 * scale}px Arial`;
+            ctx.font = `${60 * scale}px Arial`; // Aumentado de 50 a 60
             ctx.textAlign = "center";
             ctx.fillText("Toca para comenzar", canvas.width / 2, canvas.height / 2);
         }
