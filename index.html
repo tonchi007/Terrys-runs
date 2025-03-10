@@ -35,6 +35,66 @@
         #orientation-message p {
             margin: 0;
         }
+        #score-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        #score-form input {
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            width: 80%;
+        }
+        #score-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        #controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #scores-list {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        #scores-list h2 {
+            margin-top: 0;
+        }
+        #scores-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #scores-list li {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -42,10 +102,30 @@
         <p>Por favor, gira tu dispositivo a modo horizontal para jugar.</p>
     </div>
     <canvas id="game-canvas"></canvas>
+    <div id="score-form">
+        <input type="text" id="player-name" placeholder="Ingresa tu nombre" required>
+        <button onclick="saveScore()">Guardar</button>
+        <button onclick="cancelScore()">Cancelar</button>
+    </div>
+    <div id="controls">
+        <button id="start-button" onclick="startGame()">Iniciar Partida</button>
+        <button onclick="showScores()">Ver Scores</button>
+        <button onclick="resetGame()">Reiniciar Partida</button>
+    </div>
+    <div id="scores-list">
+        <h2>Mejores Puntuaciones</h2>
+        <ul id="scores-ul"></ul>
+        <button onclick="hideScores()">Cerrar</button>
+    </div>
     <script>
         const canvas = document.getElementById("game-canvas");
         const ctx = canvas.getContext("2d");
         const orientationMessage = document.getElementById("orientation-message");
+        const scoreForm = document.getElementById("score-form");
+        const playerNameInput = document.getElementById("player-name");
+        const scoresList = document.getElementById("scores-list");
+        const scoresUl = document.getElementById("scores-ul");
+        const startButton = document.getElementById("start-button");
 
         // Variables para escalar el juego
         let scale = 1;
@@ -75,7 +155,10 @@
         let score = 0;
         let isGameOver = false;
         let gameStarted = false;
-        let isPaused = false; // Nueva variable para controlar la pausa
+        let isPaused = false;
+
+        // Bandera para controlar si los botones están siendo presionados
+        let buttonsPressed = false;
 
         // Cargar imágenes del jugador
         const playerImages = ["RUMPI.png", "RUMPI2.png"].map(src => {
@@ -294,6 +377,7 @@
                     isGameOver = true;
                     isPaused = true; // Pausar el juego cuando hay Game Over
                     gameOverSound.play();
+                    showScoreForm();
                 }
             });
             
@@ -344,7 +428,6 @@
             ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
             ctx.font = `${40 * scale}px Arial`;
             ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50 * scale);
-            ctx.fillText("Toca o presiona Space para reiniciar", canvas.width / 2, canvas.height / 2 + 100 * scale);
         }
 
         // Dibujar menú de inicio
@@ -355,7 +438,13 @@
             ctx.fillStyle = "white";
             ctx.font = `${60 * scale}px Arial`;
             ctx.textAlign = "center";
-            ctx.fillText("Toca para comenzar", canvas.width / 2, canvas.height / 2);
+            ctx.fillText("Presiona 'Iniciar Partida' para comenzar", canvas.width / 2, canvas.height / 2);
+        }
+
+        // Función para iniciar el juego
+        function startGame() {
+            gameStarted = true;
+            startButton.style.display = "none"; // Ocultar el botón de inicio
         }
 
         // Función para reiniciar el juego
@@ -375,12 +464,73 @@
             gameSpeed = 5;
             score = 0;
             isGameOver = false;
-            gameStarted = false;
+            gameStarted = false; // No iniciar automáticamente
             isPaused = false;
             obstacles = [];
             signX = canvas.width;
             signY = canvas.height - 150 * scale;
-            resizeCanvas();
+            startButton.style.display = "block"; // Mostrar el botón de inicio
+            resizeCanvas(); // Ajustar el tamaño del canvas
+            drawStartMenu(); // Mostrar la pantalla de inicio
+        }
+
+        // Mostrar el formulario para guardar el score
+        function showScoreForm() {
+            scoreForm.style.display = "block";
+        }
+
+        // Guardar el score en localStorage
+        function saveScore() {
+            const playerName = playerNameInput.value.trim();
+            if (playerName === "") {
+                alert("Por favor, ingresa tu nombre.");
+                return;
+            }
+
+            // Obtener los scores guardados o inicializar un array vacío
+            const scores = JSON.parse(localStorage.getItem("scores")) || [];
+
+            // Agregar el nuevo score
+            scores.push({ name: playerName, score: score });
+
+            // Ordenar los scores de mayor a menor
+            scores.sort((a, b) => b.score - a.score);
+
+            // Guardar en localStorage
+            localStorage.setItem("scores", JSON.stringify(scores));
+
+            // Ocultar el formulario y reiniciar el juego
+            scoreForm.style.display = "none";
+            resetGame();
+        }
+
+        // Cancelar el guardado del score
+        function cancelScore() {
+            scoreForm.style.display = "none";
+            resetGame();
+        }
+
+        // Mostrar la lista de scores
+        function showScores() {
+            const scores = JSON.parse(localStorage.getItem("scores")) || [];
+            scoresUl.innerHTML = ""; // Limpiar la lista
+
+            if (scores.length === 0) {
+                scoresUl.innerHTML = "<li>No hay puntuaciones guardadas.</li>";
+            } else {
+                scores.forEach((score, index) => {
+                    const li = document.createElement("li");
+                    li.textContent = `${index + 1}. ${score.name}: ${score.score}`;
+                    scoresUl.appendChild(li);
+                });
+            }
+
+            scoresList.style.display = "block";
+        }
+
+        // Ocultar la lista de scores
+        function hideScores() {
+            scoresList.style.display = "none";
         }
 
         // Bucle principal del juego
@@ -396,40 +546,46 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Evento de toque para dispositivos móviles
-        document.addEventListener("touchstart", (event) => {
-            if (!gameStarted) {
-                gameStarted = true;
-            } else if (player.jumps < player.maxJumps) {
-                player.dy = player.jumpPower;
-                player.grounded = false;
-                player.jumps++;
-                jumpSound.play();
-            }
-            if (isGameOver) {
-                resetGame();
-            }
-        });
-
         // Evento de teclado para la barra espaciadora
         document.addEventListener("keydown", (event) => {
-            if (event.code === "Space") {
-                if (!gameStarted) {
-                    gameStarted = true;
-                } else if (player.jumps < player.maxJumps) {
+            if (event.code === "Space" && !buttonsPressed) {
+                if (player.jumps < player.maxJumps) {
                     player.dy = player.jumpPower;
                     player.grounded = false;
                     player.jumps++;
                     jumpSound.play();
                 }
-                if (isGameOver) {
-                    resetGame();
-                }
+            }
+        });
+
+        // Evento de toque para dispositivos móviles (solo para saltar)
+        document.addEventListener("touchstart", (event) => {
+            if (gameStarted && player.jumps < player.maxJumps && !buttonsPressed) {
+                player.dy = player.jumpPower;
+                player.grounded = false;
+                player.jumps++;
+                jumpSound.play();
             }
         });
 
         // Ajustar el tamaño del canvas al cambiar el tamaño de la ventana
         window.addEventListener("resize", resizeCanvas);
+
+        // Eventos para los botones de control
+        document.querySelectorAll('#controls button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                buttonsPressed = true;
+            });
+            button.addEventListener('mouseup', () => {
+                buttonsPressed = false;
+            });
+            button.addEventListener('touchstart', () => {
+                buttonsPressed = true;
+            });
+            button.addEventListener('touchend', () => {
+                buttonsPressed = false;
+            });
+        });
     </script>
 </body>
 </html>
