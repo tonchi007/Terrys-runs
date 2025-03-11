@@ -449,29 +449,36 @@
 
         // Función para reiniciar el juego
         function resetGame() {
+            // Restablecer las variables del juego
             player = { 
-                x: 100, 
-                y: 0, 
-                width: 150, 
-                height: 150, 
+                x: 100 * scale, 
+                y: canvas.height - 200 * scale, 
+                width: 150 * scale, 
+                height: 150 * scale, 
                 dy: 0, 
-                gravity: 0.5, 
-                jumpPower: -15, 
+                gravity: 0.5 * scale, 
+                jumpPower: -15 * scale, 
                 grounded: false, 
                 jumps: 0, 
                 maxJumps: 2
             };
-            gameSpeed = 5;
+            gameSpeed = 5 * scale;
             score = 0;
             isGameOver = false;
-            gameStarted = false; // No iniciar automáticamente
+            gameStarted = false;
             isPaused = false;
             obstacles = [];
             signX = canvas.width;
-            signY = canvas.height - 150 * scale;
-            startButton.style.display = "block"; // Mostrar el botón de inicio
-            resizeCanvas(); // Ajustar el tamaño del canvas
-            drawStartMenu(); // Mostrar la pantalla de inicio
+            signY = canvas.height - 220 * scale;
+
+            // Ajustar el tamaño del canvas
+            resizeCanvas();
+
+            // Mostrar el botón de inicio
+            startButton.style.display = "block";
+
+            // Mostrar la pantalla de inicio
+            drawStartMenu();
         }
 
         // Mostrar el formulario para guardar el score
@@ -501,7 +508,7 @@
 
             // Ocultar el formulario y reiniciar el juego
             scoreForm.style.display = "none";
-            resetGame();
+            resetGame(); // Reiniciar el juego después de guardar el score
         }
 
         // Cancelar el guardado del score
