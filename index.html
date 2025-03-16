@@ -148,7 +148,7 @@
 
         // Variables para controlar el cartel
         let signX = canvas.width;
-        let signY = 0;
+        let signY = 200;
 
         // Variables del juego
         let gameSpeed = 5;
@@ -192,15 +192,20 @@
             deco.img.onerror = () => console.error(`Error al cargar la imagen: cloud${index + 1}.png`);
         });
 
-        // Cargar imagen del cartel decorativo
-        const signImage = new Image();
-        signImage.src = "./sign.png";
-        signImage.onload = onImageLoad;
-        signImage.onerror = () => console.error("Error al cargar la imagen: sign.png");
+        // Cargar imágenes del avión
+        const planeImages = ["plane.png", "plane1.png"].map(src => {
+            const img = new Image();
+            img.src = src;
+            img.onload = onImageLoad;
+            img.onerror = () => console.error(`Error al cargar la imagen: ${src}`);
+            return img;
+        });
+        let currentPlaneFrame = 0;
+        let planeFrameCounter = 0;
 
         // Contador de imágenes cargadas
         let imagesLoaded = 0;
-        const totalImages = playerImages.length + obstacleImages.length + decorativeImages.length + 1;
+        const totalImages = playerImages.length + obstacleImages.length + decorativeImages.length + planeImages.length;
 
         function onImageLoad() {
             imagesLoaded++;
@@ -259,7 +264,7 @@
 
             // Ajustar la posición y tamaño del cartel
             signX = canvas.width;
-            signY = canvas.height - 220 * scale;
+            signY = canvas.height - 720 * scale;
         }
 
         // Función para verificar la orientación de la pantalla
@@ -327,15 +332,21 @@
             });
         }
 
-        // Función para dibujar el cartel decorativo
+        // Función para dibujar el avión
         function drawSign() {
-            const signWidth = 250 * scale;
-            const signHeight = 220 * scale;
-            ctx.drawImage(signImage, signX, signY, signWidth, signHeight);
+            const signWidth = 600 * scale;
+            const signHeight = 140 * scale;
+            ctx.drawImage(planeImages[currentPlaneFrame], signX, signY, signWidth, signHeight);
             signX -= gameSpeed;
 
             if (signX + signWidth < 0) {
                 signX = canvas.width;
+            }
+
+            // Alternar las imágenes del avión cada 10 fotogramas
+            planeFrameCounter++;
+            if (planeFrameCounter % 5 === 0) {
+                currentPlaneFrame = (currentPlaneFrame + 1) % planeImages.length;
             }
         }
 
